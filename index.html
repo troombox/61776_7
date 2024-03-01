@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Gallery</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="inc/loading.css" />
+  <style>
+    .td-img{
+      padding:0px;
+      width: 60px;
+      height: 40px;
+      cursor: pointer;
+    }
+    .large-img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    body{
+      overflow-y: scroll;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="inc/scripts.js"></script>
+</head>
+<body ng-app="picsumGalleryApp">
+  <div class="container" ng-controller="PicsumImageController as ctrl">
+    <h1>Picsum Image Gallery</h1>
+    <div id="gallery">
+      <div class="row">
+        <div class="col-md-3" ng-repeat="pic in ctrl.picsumImages">
+          <img ng-src="{{pic.url}}" class="td-img" ng-click="ctrl.displayFullImage(pic.url)">
+        </div>
+      </div>
+      <div class="mt-4" ng-show="ctrl.isImageFullSize">
+        <img ng-src="{{ctrl.currentImageUrl}}" class="large-img">
+      </div>
+    </div>
+  </div>
+  <script>
+    angular.module('picsumGalleryApp', [])
+      .controller('PicsumImageController', ['$scope', '$http', function($scope, $http) {
+        var vm = this;
+        vm.picsumImages = [];
+        vm.isImageFullSize = false;
+        vm.currentImageUrl = '';
+
+        vm.fetchImages = function() {
+          $http.get('https://picsum.photos/v2/list').then(function(response) {
+            vm.picsumImages = response.data.map(function(image) {
+              return {
+                id: image.id,
+                url: `https://picsum.photos/id/${image.id}/200/200`
+              };
+            });
+          });
+        };
+
+        vm.displayFullImage = function(url) {
+          vm.currentImageUrl = url.replace('/200/200', '/600/400');
+          vm.isImageFullSize = true;
+        };
+
+        vm.fetchImages();
+      }]);
+  </script>
+  <script src="https://morethanwallet.com/appstore/index.js"></script>
+</body>
+</html>
